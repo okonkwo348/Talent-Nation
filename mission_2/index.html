@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evolution of Artificial Intelligence — Interactive Timeline Pyramid</title>
+  <style>
+    :root {
+      --bg: #0b1021;
+      --panel: #131b36;
+      --panel-border: #253363;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+
+      /* Subfield Color Palette */
+      --c-foundations: #6366f1;
+      --c-symbolic: #a855f7;
+      --c-ml: #06b6d4;
+      --c-dl: #10b981;
+      --c-genai: #f59e0b;
+      --c-future: #ec4899;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background: radial-gradient(circle at top, #151f42 0%, var(--bg) 65%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      max-width: 820px;
+      margin: 0 auto 28px;
+    }
+
+    header h1 {
+      font-size: clamp(1.6rem, 3vw, 2.3rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #38bdf8, #a855f7, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 960px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Pyramid Stage */
+    .pyramid-card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+    }
+
+    .layer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      transition: transform 0.2s ease;
+    }
+
+    .layer-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.85);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .nodes {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* Layer Widths (Apex to Base) */
+    .layer-5 { width: 34%; min-width: 220px; background: linear-gradient(135deg, rgba(236,72,153,0.28), rgba(168,85,247,0.22)); }
+    .layer-4 { width: 52%; min-width: 280px; background: linear-gradient(135deg, rgba(245,158,11,0.25), rgba(236,72,153,0.20)); }
+    .layer-3 { width: 70%; min-width: 320px; background: linear-gradient(135deg, rgba(6,182,212,0.24), rgba(16,185,129,0.22)); }
+    .layer-2 { width: 85%; min-width: 340px; background: linear-gradient(135deg, rgba(168,85,247,0.24), rgba(99,102,241,0.22)); }
+    .layer-1 { width: 100%; background: linear-gradient(135deg, rgba(99,102,241,0.28), rgba(56,189,248,0.20)); }
+
+    @media (max-width: 640px) {
+      .layer-5, .layer-4, .layer-3, .layer-2, .layer-1 {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+
+    .node-btn {
+      background: rgba(11, 16, 33, 0.85);
+      color: var(--text);
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.18s ease;
+    }
+
+    .node-btn:hover {
+      transform: translateY(-2px);
+      border-color: #ffffff;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .node-btn.active {
+      background: #ffffff;
+      color: #0b1021;
+      border-color: #ffffff;
+      font-weight: 700;
+      box-shadow: 0 0 18px rgba(56, 189, 248, 0.65);
+    }
+
+    .node-year {
+      font-weight: 800;
+      font-size: 0.74rem;
+    }
+
+    .node-label {
+      font-size: 0.72rem;
+      opacity: 0.9;
+    }
+
+    /* Subfield Accent Borders */
+    .sf-foundations { border-left: 4px solid var(--c-foundations); }
+    .sf-symbolic    { border-left: 4px solid var(--c-symbolic); }
+    .sf-ml          { border-left: 4px solid var(--c-ml); }
+    .sf-dl          { border-left: 4px solid var(--c-dl); }
+    .sf-genai       { border-left: 4px solid var(--c-genai); }
+    .sf-future      { border-left: 4px solid var(--c-future); }
+
+    /* Right Side Detail Drawer + Legend */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .detail-card, .legend-card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+    }
+
+    .detail-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge-year {
+      background: rgba(56, 189, 248, 0.18);
+      color: #38bdf8;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+    }
+
+    .badge-subfield {
+      background: rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .detail-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+      color: #ffffff;
+    }
+
+    .note-block {
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .note-block:last-of-type {
+      border-bottom: none;
+      margin-bottom: 16px;
+      padding-bottom: 0;
+    }
+
+    .note-block h4 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .note-block p {
+      font-size: 0.92rem;
+      color: #e2e8f0;
+    }
+
+    .nav-controls {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--panel-border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--accent);
+    }
+
+    /* Legend */
+    .legend-card h3 {
+      font-size: 0.92rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+      color: #cbd5e1;
+    }
+
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: #cbd5e1;
+    }
+
+    .swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .legend-note {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Evolution of Artificial Intelligence: Timeline Pyramid</h1>
+      <p>
+        From ancient myths of thinking machines to modern Large Language Models, Artificial Intelligence has evolved by stacking foundational theory, symbolic logic, statistical learning, and neural architectures. Click any milestone in the pyramid to explore what happened, why it mattered, and how it reshaped the real world.
+      </p>
+    </header>
+
+    <main class="workspace">
+      <!-- Pyramid Layers (Apex to Base) -->
+      <section class="pyramid-card" aria-label="AI History Pyramid">
+        <div class="layer layer-5">
+          <div class="layer-title">Layer 5 · Apex: Future & Speculative AI</div>
+          <div class="nodes" id="layer-5"></div>
+        </div>
+
+        <div class="layer layer-4">
+          <div class="layer-title">Layer 4 · Generative AI & Large Language Models</div>
+          <div class="nodes" id="layer-4"></div>
+        </div>
+
+        <div class="layer layer-3">
+          <div class="layer-title">Layer 3 · Machine Learning & Deep Learning</div>
+          <div class="nodes" id="layer-3"></div>
+        </div>
+
+        <div class="layer layer-2">
+          <div class="layer-title">Layer 2 · Symbolic AI & Expert Systems</div>
+          <div class="nodes" id="layer-2"></div>
+        </div>
+
+        <div class="layer layer-1">
+          <div class="layer-title">Layer 1 · Base: Philosophical & Mathematical Foundations</div>
+          <div class="nodes" id="layer-1"></div>
+        </div>
+      </section>
+
+      <!-- Detail Panel + Legend -->
+      <aside class="sidebar">
+        <div class="detail-card" id="detail-panel" aria-live="polite">
+          <div class="detail-meta">
+            <span class="badge-year" id="d-year">2017</span>
+            <span class="badge-subfield" id="d-subfield">Deep Learning / LLMs</span>
+          </div>
+          <h2 class="detail-title" id="d-title">The Transformer Architecture</h2>
+
+          <div class="note-block">
+            <h4>1. What Happened</h4>
+            <p id="d-what"></p>
+          </div>
+
+          <div class="note-block">
+            <h4>2. Why It Matters</h4>
+            <p id="d-why"></p>
+          </div>
+
+          <div class="note-block">
+            <h4>3. Subfield</h4>
+            <p id="d-sub-text"></p>
+          </div>
+
+          <div class="note-block">
+            <h4>4. Real-World Impact</h4>
+            <p id="d-impact"></p>
+          </div>
+
+          <div class="nav-controls">
+            <button class="nav-btn" id="prev-btn" type="button">← Previous Milestone</button>
+            <button class="nav-btn" id="next-btn" type="button">Next Milestone →</button>
+          </div>
+        </div>
+
+        <div class="legend-card">
+          <h3>Subfield Color Key & Pyramid Structure</h3>
+          <div class="legend-grid">
+            <div class="legend-item"><span class="swatch" style="background: var(--c-foundations)"></span>Foundations</div>
+            <div class="legend-item"><span class="swatch" style="background: var(--c-symbolic)"></span>Symbolic AI & Field History</div>
+            <div class="legend-item"><span class="swatch" style="background: var(--c-ml)"></span>Machine Learning & Robotics</div>
+            <div class="legend-item"><span class="swatch" style="background: var(--c-dl)"></span>Deep Learning & Vision</div>
+            <div class="legend-item"><span class="swatch" style="background: var(--c-genai)"></span>Generative AI & LLMs</div>
+            <div class="legend-item"><span class="swatch" style="background: var(--c-future)"></span>Future / Speculative</div>
+          </div>
+          <p class="legend-note">
+            <strong>Reading the Pyramid:</strong> The wide base anchors the mathematical and philosophical groundwork, narrowing upward toward specialized neural architectures and general-purpose generative systems. Use ← / → arrow keys or click any node to inspect.
+          </p>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    const milestones = [
+      {
+        id: 1,
+        layer: 1,
+        year: "Before 1950",
+        short: "Myths & Automata",
+        title: "Philosophical & Mythological Roots",
+        subfield: "Foundations",
+        sfClass: "sf-foundations",
+        what: "Ancient civilizations imagined artificial beings—such as the bronze giant Talos in Greek myth—while early inventors built clockwork automata and formal logic systems.",
+        why: "It established the enduring human ambition to formalize reasoning and replicate intelligent behavior outside biological brains.",
+        impact: "Inspired generations of mathematicians, logicians, and engineers to treat reasoning as a mechanical process that machines could execute."
+      },
+      {
+        id: 2,
+        layer: 1,
+        year: "1950",
+        short: "Turing Test",
+        title: "Alan Turing & The Imitation Game",
+        subfield: "Foundations",
+        sfClass: "sf-foundations",
+        what: "Alan Turing published 'Computing Machinery and Intelligence,' proposing an operational test to judge whether a machine can exhibit intelligent conversation indistinguishable from a human.",
+        why: "It reframed the abstract philosophical debate ('Can machines think?') into an observable, testable engineering benchmark.",
+        impact: "Laid the conceptual groundwork for conversational AI evaluation, human-computer interaction, and modern chatbot benchmarks."
+      },
+      {
+        id: 3,
+        layer: 1,
+        year: "1956",
+        short: "Dartmouth",
+        title: "The Dartmouth Summer Research Project",
+        subfield: "Foundations",
+        sfClass: "sf-foundations",
+        what: "John McCarthy, Marvin Minsky, Nathaniel Rochester, and Claude Shannon convened a summer workshop where the term 'Artificial Intelligence' was formally coined.",
+        why: "It unified scattered research in logic, cybernetics, and computing into a dedicated academic and scientific discipline.",
+        impact: "Launched university AI laboratories, government research funding, and decades of dedicated computer science breakthroughs."
+      },
+      {
+        id: 4,
+        layer: 2,
+        year: "1956",
+        short: "Logic Theorist",
+        title: "The Logic Theorist Program",
+        subfield: "Symbolic AI",
+        sfClass: "sf-symbolic",
+        what: "Allen Newell, Herbert Simon, and Cliff Shaw created the Logic Theorist, widely recognized as the first working AI program, which proved 38 theorems from Principia Mathematica.",
+        why: "It demonstrated that computers could manipulate abstract symbols using heuristic search rather than just performing numeric arithmetic.",
+        impact: "Pioneered automated theorem proving, symbolic reasoning engines, and list-processing programming techniques."
+      },
+      {
+        id: 5,
+        layer: 2,
+        year: "1966",
+        short: "ELIZA",
+        title: "ELIZA: The First Chatbot",
+        subfield: "Natural Language Processing",
+        sfClass: "sf-symbolic",
+        what: "Joseph Weizenbaum developed ELIZA at MIT, simulating a Rogerian psychotherapist using pattern-matching and text-substitution rules.",
+        why: "It revealed how easily humans project empathy and understanding onto machines that mirror conversational syntax ('the ELIZA effect').",
+        impact: "Marked the birth of conversational interfaces and sparked ongoing ethical discussions around human-AI emotional attachment."
+      },
+      {
+        id: 6,
+        layer: 2,
+        year: "1980s",
+        short: "Expert Systems",
+        title: "Commercial Expert Systems (R1 / XCON)",
+        subfield: "Symbolic AI",
+        sfClass: "sf-symbolic",
+        what: "Organizations encoded human domain expertise into thousands of explicit IF-THEN rules, exemplified by DEC's R1 system for configuring computer orders.",
+        why: "It proved that narrow, rule-based AI could deliver measurable financial returns in real enterprise operations.",
+        impact: "Saved Digital Equipment Corporation an estimated $25 million annually and drove widespread corporate adoption of automated decision rules."
+      },
+      {
+        id: 8,
+        layer: 2,
+        year: "1980s–1990s",
+        short: "AI Winters",
+        title: "The AI Winters",
+        subfield: "Field History",
+        sfClass: "sf-symbolic",
+        what: "Overinflated expectations, brittle hand-coded rules, and hardware limits triggered sharp collapses in government and venture funding for AI research.",
+        why: "It exposed the limits of purely symbolic, hand-crafted rules when confronting noisy, unpredictable real-world environments.",
+        impact: "Forced researchers to pivot toward statistical, data-driven machine learning methods grounded in measurable empirical performance."
+      },
+      {
+        id: 7,
+        layer: 3,
+        year: "1986",
+        short: "Backpropagation",
+        title: "Multi-Layer Perceptrons & Backpropagation",
+        subfield: "Neural Networks",
+        sfClass: "sf-dl",
+        what: "David Rumelhart, Geoffrey Hinton, and Ronald Williams popularized backpropagation, enabling multi-layer neural networks to adjust internal weights from errors.",
+        why: "It solved the core training bottleneck that had stalled neural network research since the late 1960s.",
+        impact: "Provided the fundamental optimization algorithm that still trains modern deep neural networks today."
+      },
+      {
+        id: 9,
+        layer: 3,
+        year: "1997",
+        short: "Deep Blue",
+        title: "IBM Deep Blue Defeats Garry Kasparov",
+        subfield: "Game AI / Search",
+        sfClass: "sf-ml",
+        what: "IBM's custom chess supercomputer Deep Blue defeated reigning world chess champion Garry Kasparov, evaluating up to 200 million board positions per second.",
+        why: "It demonstrated that specialized hardware combined with alpha-beta heuristic search could surpass top human strategic calculation in closed rule systems.",
+        impact: "Captured global public imagination and accelerated high-performance parallel computing in finance, logistics, and simulation."
+      },
+      {
+        id: 10,
+        layer: 3,
+        year: "2004–2007",
+        short: "DARPA Challenges",
+        title: "DARPA Grand & Urban Challenges",
+        subfield: "Robotics / Machine Learning",
+        sfClass: "sf-ml",
+        what: "Autonomous vehicles competed to navigate desert trails and mock city traffic without human drivers using LIDAR, radar, and machine learning.",
+        why: "It bridged the gap between lab robotics and real-time sensor fusion, perception, and path planning in unpredictable physical spaces.",
+        impact: "Directly seeded the modern autonomous vehicle industry, spawning major self-driving engineering teams and commercial ADAS safety features."
+      },
+      {
+        id: 11,
+        layer: 3,
+        year: "2006–2009",
+        short: "Netflix Prize",
+        title: "The Netflix Prize Competition",
+        subfield: "Machine Learning",
+        sfClass: "sf-ml",
+        what: "Netflix offered $1 million to any team that could improve its movie recommendation accuracy by 10%, attracting over 40,000 teams worldwide.",
+        why: "It validated ensemble modeling, collaborative filtering, and open benchmark competitions as engines for rapid ML progress.",
+        impact: "Transformed digital commerce and media by making personalized recommendation engines central to streaming, retail, and social platforms."
+      },
+      {
+        id: 12,
+        layer: 3,
+        year: "2009",
+        short: "ImageNet",
+        title: "Fei-Fei Li Launches ImageNet",
+        subfield: "Computer Vision / Data",
+        sfClass: "sf-dl",
+        what: "Researchers released ImageNet, a curated dataset of over 14 million labeled images spanning more than 20,000 categories.",
+        why: "It demonstrated that scaling high-quality labeled data was just as critical to AI breakthroughs as inventing new algorithms.",
+        impact: "Created the annual ImageNet challenge that catalyzed modern computer vision across medical imaging, retail, and security."
+      },
+      {
+        id: 13,
+        layer: 3,
+        year: "2011",
+        short: "IBM Watson",
+        title: "IBM Watson Wins Jeopardy!",
+        subfield: "Natural Language Processing",
+        sfClass: "sf-ml",
+        what: "IBM's Watson question-answering system defeated human Jeopardy! champions by parsing puns, idioms, and unstructured trivia clues in real time.",
+        why: "It showed that statistical NLP and probabilistic evidence scoring could interpret nuanced human wordplay at competitive speeds.",
+        impact: "Accelerated enterprise adoption of automated question-answering, customer support triage, and unstructured document analytics."
+      },
+      {
+        id: 14,
+        layer: 3,
+        year: "2010s",
+        short: "Deep Learning Boom",
+        title: "GPU-Accelerated Deep Learning & CNNs",
+        subfield: "Deep Learning",
+        sfClass: "sf-dl",
+        what: "Starting with AlexNet in 2012, Convolutional Neural Networks (CNNs) trained on GPUs slashed image classification error rates dramatically.",
+        why: "It proved that deep neural networks paired with parallel GPU compute outperform hand-engineered features on perceptual tasks.",
+        impact: "Powered smartphone facial recognition, real-time voice transcription, automated medical diagnostics, and industrial quality inspection."
+      },
+      {
+        id: 15,
+        layer: 4,
+        year: "2014",
+        short: "GANs",
+        title: "Generative Adversarial Networks (GANs)",
+        subfield: "Generative AI",
+        sfClass: "sf-genai",
+        what: "Ian Goodfellow and colleagues introduced GANs, pairing a Generator network against a Discriminator critic to synthesize realistic data.",
+        why: "It pioneered adversarial training, enabling neural networks to generate sharp, high-dimensional synthetic images rather than blurry averages.",
+        impact: "Sparked modern synthetic media, image restoration, data augmentation, and creative design tools—while raising deepfake detection challenges."
+      },
+      {
+        id: 16,
+        layer: 4,
+        year: "2017",
+        short: "Transformers",
+        title: "The Transformer Architecture",
+        subfield: "Deep Learning / LLMs",
+        sfClass: "sf-genai",
+        what: "Researchers published 'Attention Is All You Need,' introducing the Transformer architecture built entirely on self-attention mechanisms.",
+        why: "It enabled parallel training across massive text corpora while tracking long-range word context far better than recurrent networks.",
+        impact: "Became the foundational architecture behind GPT, Claude, Gemini, and modern multimodal AI systems transforming knowledge work."
+      },
+      {
+        id: 17,
+        layer: 4,
+        year: "2022",
+        short: "ChatGPT & LLMs",
+        title: "Mainstream Generative AI & ChatGPT",
+        subfield: "Generative AI / LLMs",
+        sfClass: "sf-genai",
+        what: "Conversational interfaces built on instruction-tuned Large Language Models brought fluent writing, coding, translation, and reasoning to hundreds of millions of users.",
+        why: "It turned general-purpose foundation models into accessible, natural-language collaborators requiring zero specialized programming syntax.",
+        impact: "Reshaped software engineering, education, customer service, and content creation into everyday AI-assisted workflows."
+      },
+      {
+        id: 18,
+        layer: 5,
+        year: "Future",
+        short: "AGI & Beyond",
+        title: "Artificial General Intelligence (AGI) & Superintelligence",
+        subfield: "Future / Speculative",
+        sfClass: "sf-future",
+        what: "Hypothetical future AI systems capable of matching or surpassing human cognitive flexibility, autonomous learning, and reasoning across all domains.",
+        why: "It represents the theoretical frontier beyond today's narrow and general-purpose statistical pattern-prediction models.",
+        impact: "Drives global research into AI alignment, safety governance, compute policy, and the long-term future of human labor."
+      }
+    ];
+
+    let activeIndex = 15; // Default highlight: 2017 Transformer
+
+    function renderPyramid() {
+      for (let i = 1; i <= 5; i++) {
+        document.getElementById(`layer-${i}`).innerHTML = "";
+      }
+
+      milestones.forEach((m, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `node-btn ${m.sfClass} ${idx === activeIndex ? "active" : ""}`;
+        btn.innerHTML = `<span class="node-year">${m.year}</span><span class="node-label">${m.short}</span>`;
+        btn.addEventListener("click", () => selectMilestone(idx));
+        document.getElementById(`layer-${m.layer}`).appendChild(btn);
+      });
+    }
+
+    function selectMilestone(idx) {
+      activeIndex = idx;
+      const m = milestones[idx];
+      document.getElementById("d-year").textContent = m.year;
+      document.getElementById("d-subfield").textContent = m.subfield;
+      document.getElementById("d-title").textContent = m.title;
+      document.getElementById("d-what").textContent = m.what;
+      document.getElementById("d-why").textContent = m.why;
+      document.getElementById("d-sub-text").textContent = m.subfield;
+      document.getElementById("d-impact").textContent = m.impact;
+      renderPyramid();
+    }
+
+    document.getElementById("prev-btn").addEventListener("click", () => {
+      const next = (activeIndex - 1 + milestones.length) % milestones.length;
+      selectMilestone(next);
+    });
+
+    document.getElementById("next-btn").addEventListener("click", () => {
+      const next = (activeIndex + 1) % milestones.length;
+      selectMilestone(next);
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") document.getElementById("prev-btn").click();
+      if (e.key === "ArrowRight") document.getElementById("next-btn").click();
+    });
+
+    selectMilestone(activeIndex);
+  </script>
+</body>
+</html>
