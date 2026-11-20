@@ -239,6 +239,7 @@ Running `import dis; dis.dis('print("Hello, Python!")')` reveals the internal PV
 | **3:30–6:00** | **Script Creation & Execution** | Creating `hello.py`, writing `print("Hello, Python!")`, saving, and running via terminal (`python hello.py`). | Show the output `Hello, Python!` appearing in the terminal console. | 
 | **6:00–8:30** | **Under the Hood Explanation** | Visual slide/overlay of source code → AST → Bytecode → PVM pipeline, plus a quick demonstration of a intentional `SyntaxError`. | Contrast compile-time syntax errors with runtime exceptions. | 
 | **8:30–10:00** | **Wrap-Up & Troubleshooting Tip** | Quick recap of setup steps and highlighting the Troubleshooting Desk guide. | Provide clear closing guidance for beginners. | 
+[link of the video] (https://drive.google.com/file/d/1Oe32djR0itYDZZmgsjsUfSv0jT6UDqva/view?usp=sharing).
 
 ## ✅ 8. Final Submission Checklist
 
